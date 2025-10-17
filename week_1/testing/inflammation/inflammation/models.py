@@ -43,6 +43,15 @@ def patient_normalise(data):
     If the maximal inflammation value is negative, all returned values are rounded to 0.
     """
 
+    # Check if the data is a Numpy ndarray
+    if not isinstance(data, np.ndarray):
+        raise TypeError('Data should be a Numpy ndarray')
+    
+    # Check that the data is a 2d-array
+    if data.ndim != 2:
+        raise ValueError('Data should be a 2-dimentional array')
+
+    # Check if the data contains negative values
     if np.any(data < 0):
         raise ValueError('Inflammation values should not be negative')
 
@@ -50,9 +59,9 @@ def patient_normalise(data):
     if data.shape[0] == 0 or data.shape[1] == 0:
         return data
 
-    max = np.maximum(np.nanmax(data, axis=1), 0)
+    max_data = np.nanmax(data, axis=1)
     with np.errstate(invalid='ignore', divide='ignore'):
-        normalised = data / max[:, np.newaxis]
+        normalised = data / max_data[:, np.newaxis]
     normalised[np.isnan(normalised)] = 0
     normalised[normalised < 0] = 0
     return normalised

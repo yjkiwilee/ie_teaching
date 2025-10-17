@@ -29,29 +29,31 @@ def test_daily_mean_integers():
     # Need to use Numpy testing functions to compare arrays
     npt.assert_array_equal(daily_mean(test_input), test_result)
 
-def test_daily_max_integers():
+@pytest.mark.parametrize(
+    'test, expected',
+    [
+        ([[1, 4, 9], [3, 7, 1], [8, 6, 3]], [8, 7, 9]),
+        ([[2, 8, 4], [3, 7, 1], [7, 6, 3]], [7, 8, 4]),
+    ])
+def test_daily_max_integers(test, expected):
     """Test that the daily max functions works for an array of positive integers."""
     from inflammation.models import daily_max
 
-    test_input = np.array([[1, 4, 9],
-                           [3, 7, 1],
-                           [8, 6, 3]])
-    test_result = np.array([8, 7, 9])
-
     # Need to use Numpy testing functions to compare arrays
-    npt.assert_array_equal(daily_max(test_input), test_result)
+    npt.assert_array_equal(daily_max(np.array(test)), np.array(expected))
 
-def test_daily_min_integers():
+@pytest.mark.parametrize(
+    'test, expected',
+    [
+        ([[7, 1, 5], [3, 7, 9], [8, 6, 1]], [3, 1, 1]),
+        ([[2, 8, 4, 10], [3, 7, 1, 6], [7, 6, 3, 1]], [2, 6, 1, 1]),
+    ])
+def test_daily_min_integers(test, expected):
     """Test that the daily max functions works for an array of positive integers."""
     from inflammation.models import daily_min
 
-    test_input = np.array([[7, 1, 5],
-                           [3, 7, 9],
-                           [8, 6, 1]])
-    test_result = np.array([3, 1, 1])
-
     # Need to use Numpy testing functions to compare arrays
-    npt.assert_array_equal(daily_min(test_input), test_result)
+    npt.assert_array_equal(daily_min(np.array(test)), np.array(expected))
 
 def test_daily_min_string():
     """Test for TypeError when passing strings"""
@@ -75,14 +77,24 @@ def test_daily_min_string():
     "test, expected, expect_raises",
     [
         (
-            [[-1, 2, 3], [4, 5, 6], [7, 8, 9]],
-            [[0, 0.67, 1], [0.67, 0.83, 1], [0.78, 0.89, 1]],
+            np.array([[-1, 2, 3], [4, 5, 6], [7, 8, 9]]),
+            None,
             ValueError,
         ),
         (
-            [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
-            [[0.33, 0.67, 1], [0.67, 0.83, 1], [0.78, 0.89, 1]],
+            np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]),
+            np.array([[0.33, 0.67, 1], [0.67, 0.83, 1], [0.78, 0.89, 1]]),
             None,
+        ),
+        (
+            'Foo',
+            None,
+            TypeError
+        ),
+        (
+            np.array([1, 2, 3, 4]),
+            None,
+            ValueError,
         ),
     ])
 def test_patient_normalise(test, expected, expect_raises):
@@ -90,6 +102,6 @@ def test_patient_normalise(test, expected, expect_raises):
     from inflammation.models import patient_normalise
     if expect_raises is not None:
         with pytest.raises(expect_raises):
-            npt.assert_almost_equal(patient_normalise(np.array(test)), np.array(expected), decimal=2)
+            npt.assert_almost_equal(patient_normalise(test), np.array(expected), decimal=2)
     else:
-        npt.assert_almost_equal(patient_normalise(np.array(test)), np.array(expected), decimal=2)
+        npt.assert_almost_equal(patient_normalise(test), np.array(expected), decimal=2)
