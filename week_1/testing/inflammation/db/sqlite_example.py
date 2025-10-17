@@ -11,7 +11,7 @@ def query_database(sql, conn = None):
     
     # Check if connection has been provided
     if not conn:
-        raise ValueError("Database connection must be provided.")
+        raise TypeError("Database connection must be provided.")
 
     # cursor - used to traverse and manipulate results returned by a query
     cursor = conn.cursor()
@@ -19,5 +19,5 @@ def query_database(sql, conn = None):
     cursor.execute(sql)
     # fetchall - returns a list of tuples containing all rows of our result
     result = cursor.fetchall()
-    conn.close()
+    # conn.close()
     return result
