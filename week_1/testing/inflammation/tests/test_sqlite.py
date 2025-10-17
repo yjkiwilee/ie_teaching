@@ -4,18 +4,22 @@ from pathlib import Path
 from db.sqlite_example import connect_to_database, query_database
 
 @pytest.fixture()
-def database_connection():
+def database_filename(tmp_path_factory):
+    return tmp_path_factory.mktemp("test_data") / "test.db"
+
+@pytest.fixture()
+def database_connection(database_filename):
     # If the database already exists, delete it
-    if Path("test.db").exists():
-        Path.unlink("test.db")
+    if Path(database_filename).exists():
+        Path.unlink(database_filename)
     # Create a new test database and enter some data
-    conn = sqlite3.connect("test.db")
+    conn = sqlite3.connect(database_filename)
     
     # Return the DB connection
     return conn
 
 @pytest.fixture()
-def setup_database(database_connection):
+def setup_database(database_filename, database_connection):
     # Add data to database
     cur = database_connection.cursor()
     cur.execute("CREATE TABLE Animals(Name, Species, Age)")
@@ -26,7 +30,7 @@ def setup_database(database_connection):
 
     # Remove the database
     cur.execute("DROP TABLE Animals")
-    Path.unlink("test.db")
+    Path.unlink(database_filename)
 
 def test_connect_to_db_type():
     """
