@@ -11,23 +11,27 @@ class Trial:
         data: Trial data
     """
 
-    def __init__(self, trial_id, data_fname):
+    def __init__(self, trial_id, trial_data):
         self.id = trial_id
-        self.data = self.load_csv(data_fname)
+        self.data = trial_data
 
-    @staticmethod
-    def load_csv(fname):
+    @classmethod
+    def from_csv(cls, trial_id, trial_fname):
         """
-        Load a CSV file containing trial data.
+        Create trial data from a CSV file
 
         Parameters:
-            fname (str): Path to the CSV file
+            trial_id (int): ID of the trial
+            trial_fname (str): Path to the CSV file
 
         Returns:
-            data (np.ndarray): 2D array containing the data
+            trial (Trial): Trial instance containing the data from the CSV file
         """
 
-        return np.loadtxt(fname=fname, delimiter=',')
+        return cls(
+            trial_id,
+            np.loadtxt(fname=trial_fname, delimiter=',')
+        )
 
     def daily_mean(self):
         """Calculate the daily mean of a 2d inflammation data array."""
